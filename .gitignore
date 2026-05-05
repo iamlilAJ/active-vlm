@@ -5,6 +5,9 @@ logs/
 # Development files
 dev/
 
+# Local stack runtime data
+tools/local-stack/.data/
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,macos,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm,macos,linux
 

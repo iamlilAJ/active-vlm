@@ -1,0 +1,15 @@
+[project]
+name = "active-vlm-local-stack"
+version = "0.1.0"
+description = "Local cropping MCP server + MinIO stack for active-vlm dev/repro"
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=2.12.4",
+    "pillow>=10",
+    "minio>=7.2.18",
+    "httpx>=0.28",
+    "structlog>=24.4.0",
+]
+
+[tool.uv]
+package = false
