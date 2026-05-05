@@ -1,0 +1,102 @@
+api_concurrency_limit: 64
+benchmark_concurrency: 16
+benchmarks:
+  vstar:
+    dataset: vstar
+    concurrency: ${benchmark_concurrency}
+    loader_args:
+      data_path: ${oc.env:VSTAR_DATA_PATH}
+      image_dir: ${oc.env:VSTAR_IMAGE_DIR}
+  cvbench:
+    dataset: cvbench
+    concurrency: ${benchmark_concurrency}
+  hr4k:
+    dataset: hrbench-4k
+    concurrency: ${benchmark_concurrency}
+  hr8k:
+    dataset: hrbench-8k
+    concurrency: ${benchmark_concurrency}
+  mme:
+    dataset: mme
+    concurrency: ${benchmark_concurrency}
+    loader_args:
+      data_path: ${oc.env:MME_DATA_PATH}
+      image_dir: ${oc.env:MME_IMAGE_DIR}
+logging:
+  level: info
+  json: false
+  handlers:
+    - type: console
+    - type: file
+      path: ${oc.env:CV_AGENT_LOG_PATH,/tmp/boed.full.XXXXXX.log}
+      level: info
+      json: true
+llm: &llm_def
+  name: openai_model
+  parameters:
+    model: ${oc.env:CV_AGENT_MODEL,Qwen3-VL-30B-A3B-Instruct}
+    base_url: ${oc.env:OPENAI_BASE_URL}
+    api_key: ${oc.env:OPENAI_API_KEY}
+    max_tokens: 2048
+    max_retries: 3
+tools: &tools_def
+  - name: cropping
+    parameters:
+      server_url: ${oc.env:CV_AGENT_CROPPING_MCP_URL}
+state: &state_def
+  question: str
+  messages: list[AnyMessage]
+  original_figure_url: str
+  current_turn: int
+  max_turns: int
+  url_map: dict
+  image_dimensions: dict
+  prefix: str
+  direct_reasoning_result: str
+  tool_usage: dict
+agent_config: &agent_config_def
+  max_turns: 10
+workflow:
+  entry_point: agent
+  nodes:
+    agent:
+      name: planner_agent_node
+      parameters:
+        tools:  # provide names of tools configured above
+          - cropping
+        prompt_generator:
+          name: planner
+    action:
+      name: boed_crop_tool_executor
+      parameters:
+        scaling_factors: [1.5, 1, 0.8]
+        n_samples: 5
+    direct_reasoner:
+      name: direct_reasoning_node
+      parameters:
+        prompt_generator:
+          name: direct_reasoning
+    final_aggregator:
+      name: final_aggregator_node
+      parameters:
+        prompt_generator:
+          name: aggregator_system
+  edges:
+    - source: agent
+      condition:
+        function: cv_agent_react_should_continue
+        parameters:
+          use_hard_turn_limit: False
+        mapping:
+          continue: action
+          end: direct_reasoner
+    - source: action
+      target: agent
+    - source: direct_reasoner
+      target: final_aggregator
+    - source: final_aggregator
+      target: END
+invocation_config:
+  callbacks:
+    - langfuse
+  recursion_limit: 100

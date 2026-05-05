@@ -1,0 +1,69 @@
+[project]
+name = "cv-agent"
+version = "0.1.0"
+description = "Config-driven active reasoning agents for vision-language benchmarks"
+readme = "README.md"
+authors = [
+    { name = "Ziqin Gong", email = "gongzq0301@gmail.com" },
+    { name = "Anjie Liu", email = "liuanjie51@gmail.com"}
+]
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=2.12.4",
+    "httpx>=0.28.1",
+    "jinja2>=3.1.6",
+    "langchain>=0.3.27",
+    "langchain-openai>=0.3.35",
+    "langgraph>=0.6.10",
+    "minio>=7.2.18",
+    "omegaconf>=2.3.0",
+    "pillow>=12.0.0",
+    "backoff>=2.2.1",
+    "datasets>=2.20.0",
+    "structlog>=24.4.0",
+    "anyio>=4.11.0",
+    "typer>=0.21.0",
+    "orjson>=3.11.3",
+    "langfuse>=3.11.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "ruff>=0.8.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.14,<0.9.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipython>=9.6.0",
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # isort
+    "I",
+    # logging format
+    "G",
+]
+ignore = [
+    # allow f-string for logging
+    "G004",
+]
