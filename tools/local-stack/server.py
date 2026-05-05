@@ -25,6 +25,7 @@ def _disable_proxy_for_localhost() -> None:
 
 _disable_proxy_for_localhost()
 
+import anyio  # noqa: E402
 import httpx  # noqa: E402
 import structlog  # noqa: E402
 from _minio import get_minio_config, make_minio_client, public_url_for  # noqa: E402
@@ -74,11 +75,28 @@ async def crop_image_tool_crop_image_post(
         response = await client.get(image_url)
         response.raise_for_status()
 
-    image = Image.open(BytesIO(response.content))
-    cropped = image.crop((int(x1), int(y1), int(x2), int(y2)))
-    body = image_to_jpeg_bytes(cropped)
-
     object_name = f"crops/{uuid.uuid4().hex}.jpg"
+    cropped_size, public_url = await anyio.to_thread.run_sync(
+        _crop_and_upload, response.content, int(x1), int(y1), int(x2), int(y2), object_name
+    )
+    logger.info(
+        "crop_uploaded",
+        source_url=image_url,
+        coordinates=[int(x1), int(y1), int(x2), int(y2)],
+        cropped_size=cropped_size,
+        public_url=public_url,
+        latency_seconds=round(time.perf_counter() - started, 3),
+    )
+    return {"status": "success", "output_image": public_url}
+
+
+def _crop_and_upload(
+    image_bytes: bytes, x1: int, y1: int, x2: int, y2: int, object_name: str
+) -> tuple[tuple[int, int], str]:
+    """CPU/blocking-I/O slice of the crop pipeline; runs in a worker thread."""
+    image = Image.open(BytesIO(image_bytes))
+    cropped = image.crop((x1, y1, x2, y2))
+    body = image_to_jpeg_bytes(cropped)
     MINIO_CLIENT.put_object(
         CONFIG.bucket_name,
         object_name,
@@ -86,17 +104,7 @@ async def crop_image_tool_crop_image_post(
         length=len(body),
         content_type="image/jpeg",
     )
-
-    public_url = public_url_for(CONFIG, object_name)
-    logger.info(
-        "crop_uploaded",
-        source_url=image_url,
-        coordinates=[int(x1), int(y1), int(x2), int(y2)],
-        cropped_size=cropped.size,
-        public_url=public_url,
-        latency_seconds=round(time.perf_counter() - started, 3),
-    )
-    return {"status": "success", "output_image": public_url}
+    return cropped.size, public_url_for(CONFIG, object_name)
 
 
 if __name__ == "__main__":

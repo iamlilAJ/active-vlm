@@ -16,6 +16,8 @@ expose ports 9000/9001/8000 to the internet.
    docker compose up -d
    docker compose ps          # wait until minio is "healthy" and minio-init exits 0
    ```
+   If MinIO exits with `FATAL Unable to use the drive /data: drive not found`,
+   create the host-side bind path manually and retry: `mkdir -p .data/minio && docker compose up -d`.
 
 3. **Install server deps** (creates `tools/local-stack/.venv`):
    ```bash
@@ -64,6 +66,7 @@ All settings are env vars; defaults match the bundled compose file.
 | `MINIO_BUCKET` | `cv-agent` | Auto-created with anonymous-download policy. |
 | `MINIO_PUBLIC_BASE_URL` | = `MINIO_ENDPOINT` | Override when downstream consumers (VLM, other tools) need a different host than the server itself uses. |
 | `MCP_HOST` / `MCP_PORT` | `0.0.0.0` / `8000` | Server bind. |
+| `CROP_DOWNLOAD_TIMEOUT` | `30` (seconds) | HTTP timeout when the server fetches the source image before cropping. Bump for slow upstreams. |
 
 ## Architecture note: why the server runs on the host, not in docker
 

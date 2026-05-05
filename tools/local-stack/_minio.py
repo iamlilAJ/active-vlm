@@ -39,7 +39,7 @@ def get_minio_config() -> MinioConfig:
 
 
 def make_minio_client(config: MinioConfig) -> Minio:
-    netloc = config.endpoint.removeprefix("https://").removeprefix("http://")
+    netloc = config.endpoint.removeprefix("https://").removeprefix("http://").rstrip("/")
     return Minio(
         netloc,
         access_key=config.access_key,
