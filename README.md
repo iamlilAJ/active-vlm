@@ -157,11 +157,14 @@ The tests are offline by default and validate config loading, registry wiring, p
 ## Citation
 
 ```bibtex
-@inproceedings{liu2026activevlm,
-  title     = {Active Reasoning Vision-Language Models via Sequential Experimental Design},
-  author    = {Liu, Anjie and Gong, Ziqin and Song, Yan and Chen, Yuxiang and Liu, Xiaolong and Lu, Hengtong and Zhang, Kaike and Wei, Chen},
-  booktitle = {Proceedings of the 43rd International Conference on Machine Learning (ICML)},
-  year      = {2026}
+@misc{liu2026active,
+  title         = {Active Reasoning Vision-Language Models via Sequential Experimental Design},
+  author        = {Liu, Anjie and Gong, Ziqin and Song, Yan and Chen, Yuxiang and Liu, Xiaolong and Lu, Hengtong and Zhang, Kaike and Wei, Chen},
+  year          = {2026},
+  eprint        = {2605.01345},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  url           = {https://arxiv.org/abs/2605.01345},
 }
 ```
 
