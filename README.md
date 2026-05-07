@@ -104,7 +104,7 @@ uv run -m cv_agent.main_benchmark_multi <config.yaml>
 ```
 
 Included Configs:
-- `configs/boed-full.yaml`: primary full benchmark config running FOVEA cropping over MME, V*Bench, CV-Bench, and HR-Bench.
+- `configs/boed-full.yaml`: primary full benchmark config using BOED cropping over MME, V*Bench, CV-Bench, and HR-Bench.
 - `configs/lookahead-mme-remote-sensing.yaml`: look-ahead cropping policy on MME remote-sensing tasks.
 - `configs/mcmc-mme-remote-sensing.yaml`: MCMC cropping policy on MME remote-sensing tasks.
 
@@ -179,7 +179,7 @@ These are all included in `.env.example`. You can run with `uv run --env-file .e
 
 ## Running
 
-Run the full FOVEA benchmark:
+Run the full BOED benchmark config:
 
 ```bash
 uv run python -m cv_agent.main_benchmark_multi configs/boed-full.yaml
